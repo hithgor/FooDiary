@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+
+:root {
+    --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0, 0.24)
+}
+
+body {
+    background-color: #f7f7f7;
+    text-align: center;
+    font-family: 'Lato';
+}
+
+.logregist {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: none;
+    position: fixed;
+    justify-content: space-between;
+    box-shadow: var(--box-shadow);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+.logregist.hidden {
+    display: flex;
+    align-items: center;
+    opacity: 0.9;
+}
+.logregist form {
+    width: 25%;
+    display: inline-block;
+    min-height: 20vh;
+    margin: 20px auto;
+    background: #efefef;
+    padding: 15px 30px 20px 30px;
+    text-align: center;
+    -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+  }
+
+
+h1 .mainTitleH1 {
+    padding-top: 20px;
+    display: flex;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    width: 85%;
+    margin: 15px auto;
+    justify-content: space-between;
+}
+
+.alertContainer {
+    display: flex;
+    justify-content: center;
+}
+
+
+.mainBtn {
+    padding: 20px;
+    height: 20vh;
+    flex-basis: 25%;
+    background-color: bisque;
+    text-align: center;
+    border-radius: 7px;
+    box-shadow: var(--box-shadow);
+    opacity: 0.7;
+}
+
+.mainBtn:hover {
+    opacity: 1;
+    transition: ease-in;
+    transition-duration: 30ms;
+}
+
+#middleBtn {
+    margin-top: 20px;
+}

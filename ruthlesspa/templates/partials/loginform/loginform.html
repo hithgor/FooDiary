@@ -1,0 +1,29 @@
+{% block content %}
+
+  <form action="{% url 'user:create' %}" method="POST" name="myForm">
+    <label>
+      <p class="label-txt">ENTER YOUR EMAIL</p>
+      <input type="text" class="input" name="email" autocomplete="email" required>
+      <div class="line-box">
+        <div class="line"></div>
+      </div>
+    </label>
+    <label>
+      <p class="label-txt">ENTER YOUR PASSWORD</p>
+      <input type="password" class="input" autocomplete="current-password" name="password" required>
+      <div class="line-box">
+        <div class="line"></div>
+      </div>
+    </label>
+    <label>
+      <p class="label-txt">ENTER YOUR NAME</p>
+      <input type="text" class="input" name="name" autocomplete="Preferred name" required>
+      <div class="line-box">
+        <div class="line"></div>
+      </div>
+    </label>
+    <button type="submit">register</button>
+
+  </form>
+
+  {% endblock %}

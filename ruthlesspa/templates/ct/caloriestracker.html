@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caloriestracker</title>
+
+ 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'stylecalories.css' %}">
+    <!-- Datepicker.css -->
+    <link rel="stylesheet" href="{% static 'Datepicker-master/datepicker.css' %}">
+</head>
+<body id = "bodyId">
+    
+    <nav class="navbar navbar-dark">
+        <a class="navbar-brand">CaloriesTracker</a>
+        {% if user.is_authenticated %}
+            <form action="{% url 'user:logout' %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit" method="POST" id="logout">Logout</button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="toggleLogin" >Login Options</button>
+          {% endif %}
+    </nav>
+
+    {% include 'partials/_alerts.html' %}
+ <!-- Login partials - shown if clicked on login button -->
+    <div class="logregist" id="loginHideShowDiv">
+        {% include 'partials/loginform/loginform.html' %} 
+        {% include 'partials/registerform.html' %}
+    </div>
+ <!-- Buttons for days - to be replaced by dynamic dates from calendar-->
+    <input type="text" id="datepicker" autocomplete="off">
+    <button type="button" class="btn btn-secondary" id="todayBtn" type="submit">Confirm and Search</button>
+
+
+<!-- Cards representing each meal of the day - will be dynamically added and removed-->
+        <div class="cardContainerButtons">
+            <button class="btn-secondary" id="addMealButton" type="submit"
+            >Add MealCard</button>
+            <button class="btn-secondary" id="sendToDB" type="submit"
+            >Send to Db</button>
+        </div>
+        <div class= "cardContainer" id="cardContainer"> 
+
+            </div>
+        </div>
+
+        <div class="calories-stats">
+            <div class="weekly-consumed-stats">
+                <h2 class="summary">1500 Calories consumed today</h2>
+                <h3>Target: 500</h3>
+                <h3>Calories left: 100</h3>
+            </div>
+            <div class="monthly-prediction-stats">
+                <h2 class="summary">At this rate you'll consume 2000kcal this month</h2>
+                <h3>Target percentage prediction:</h3>
+                <h3> 50000kcal</h3>
+
+            </div>
+        </div>
+    
+
+
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+        var csrftoken = '{{ csrf_token }}';
+    </script>
+    <script type="module" src="../static/main.js"></script>
+    <!-- Datepicker.js -->
+    <script type="module" src="../static/Datepicker-master/datepicker.js"></script>
+    <script type="module" src="../static/caloriestracker.js"></script>
+
+</body>
+</html>

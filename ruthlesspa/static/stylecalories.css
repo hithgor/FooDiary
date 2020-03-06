@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+
+:root {
+    --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0, 0.24)
+}
+
+body {
+    background-color: #373A36;
+    font-family: 'Lato';
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar {
+    background-color: #E6E2DD;
+    align-self: flex-start;
+}
+
+.days {
+    padding-top: 5vh;
+}
+
+.btn-secondary {
+    background-color: #E6E2DD;
+    color:#373A36;
+    box-shadow: var(--box-shadow);
+}
+
+#todayBtn {
+    width: 15%;
+    height: 5vh;
+}
+
+.btn-outline-secondary {
+    background-color: inherit;
+    color: #373A36;
+    border-color: #373A36;
+    box-shadow: var(--box-shadow);
+}
+
+.cardContainerButtons {
+    display: flex;
+    min-width: inherit;
+}
+
+
+.cardContainer {
+    display: flex;
+    height: 40vh;
+    align-items: flex-start;
+    max-width: 1250px;
+}
+
+
+.card {
+    background-color: #E6E2DD;
+    color: #373A36;
+    display: flex;
+    min-width: 250px;
+    min-height: 40vh;
+    box-shadow: var(--box-shadow);
+}
+
+.card-body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+}
+.remove-meal {
+    position: fixed;
+    align-self: flex-start;
+    background-color: inherit;
+}
+.card-body #add-meal-button {
+    position: fixed;
+    align-self: flex-end;
+}
+.card-text-name, .card-text-calories {
+    flex: 1;
+}
+
+.calories-stats {
+    padding-top: 10vh;
+    min-width: 60%;
+    display: flex;
+}
+
+.weekly-consumed-stats {
+    text-align: left;
+    color: #E6E2DD;
+    flex: 1;
+}
+
+.monthly-prediction-stats {
+    text-align: left;
+    color: #E6E2DD;
+    flex: 1;
+}
+

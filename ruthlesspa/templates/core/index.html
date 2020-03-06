@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruthless Personal Assistant</title>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="{% static 'loginform.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <form action="{% url 'user:logout' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" id="logout">Logout
+            </button>
+        </form>
+    {% endif %}
+    <div class="logregist">
+        {% include 'partials/loginform/loginform.html' %}
+        {% include 'partials/registerform.html' %}
+    </div>
+    <h1 class="mainTitleH1">Daily improvement motivation</h1>
+    <div class="container">
+        <a href="{% url 'caloriestracker' %}" class="mainBtn" >Calories tracker
+            <div id="caloriestrackerBtn">
+            </div>
+        </a>
+
+        <a href="pomodoros.html" class="mainBtn" id="middleBtn">Pomodoro Tracker
+            <div id="pomodorosBtn">
+            </div>
+        </a>
+
+        <a href="{% url 'expensestracker' %}" class="mainBtn">Expenses tracker
+            <div id="expensestrackerBtn">
+            </div></a>
+    </div>
+
+    
+
+    <script src="{% static 'loginform.js' %}"></script>
+    <script src="{% static 'main.js' %}"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</body>
+</html>
