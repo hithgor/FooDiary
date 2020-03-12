@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
-import json
+import json, requests
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from .models import MealCard, Ingredient
+
 
 
 def index(request):
@@ -62,9 +63,76 @@ class BaseMealCardsViewSer(viewsets.GenericViewSet,
                 mcDateCreated =     data4['dateCreated']
 
                 targetDayMealCards = MealCard.objects.order_by('number').filter(user=mcUser, dateCreated=mcDateCreated)
-                print(list(targetDayMealCards.values()))
-                return JsonResponse(list(targetDayMealCards.values()), safe=False)
+                IngredientList = Ingredient.objects.get(mealcard = targetDayMealCards[0].id)
+                resp = []
+
+                for i in targetDayMealCards:
+                    IngredientList = Ingredient.objects.filter(mealcard = i.id)
+                    namesCaloriesToResponse = []
+                    for j in IngredientList:
+                        ingredientContext = {
+                            'name': j.name,
+                            'energy': j.energy,
+                        }
+                        namesCaloriesToResponse.append(ingredientContext)
+
+                    context = {
+                        'id': i.id,
+                        'number': i.number,
+                        'mealTitle': i.mealTitle,
+                        'dateCreated': i.dateCreated,
+                        'namesCalories': namesCaloriesToResponse
+                    }
+                    resp.append(context)
+                    
+        
+                return JsonResponse(resp, safe=False)
 
 
         else:
             return HttpResponse('Unauthorized', status=401)
+
+#------- HELPER FUNCTIONCS -------#
+def searchForValueInJson(jsonData, searchedValue):
+    amount = 0
+    for i in jsonData['foodNutrients']:
+        if i['nutrient']['name'].lower() == searchedValue.lower():
+            amount = i['amount']
+    return amount
+
+
+
+class BaseIngredientsView(viewsets.GenericViewSet,
+                             mixins.ListModelMixin,
+                             mixins.CreateModelMixin):
+    #Base ingredient-related views for the API
+
+    def getIngredientFromId(request):
+        
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                data = json.loads(request.body)
+                IngredientId = data['reqIngredientId']
+                URL = f'https://api.nal.usda.gov/fdc/v1/{IngredientId}?api_key=tkjynWdwgrZk4ZSFXGK43b36n34uLXnY5aUQsWWc'
+                req = requests.get(url = URL)
+                data = req.json()
+
+                proteinValue = searchForValueInJson(data, "protein")
+                fatValue = searchForValueInJson(data, "Total lipid (fat)")
+                carbohydratesValue = searchForValueInJson(data, "Total lipid (fat)")
+
+                response = {
+                    'protein': proteinValue,
+                    'fat': fatValue,
+                    'carbohydrates': carbohydratesValue,
+                }
+                
+
+                return JsonResponse(response, safe=False)
+
+
+
+
+        else:
+            return HttpResponse('Unauthorized', status=401)
+

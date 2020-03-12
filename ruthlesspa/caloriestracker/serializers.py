@@ -7,8 +7,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'energy',)
-        read_only_fields = ('id')
+        fields = ('name', 'energy',)
+        #read_only_fields = ('id')
 
 
 class MealSerializer(serializers.ModelSerializer):
