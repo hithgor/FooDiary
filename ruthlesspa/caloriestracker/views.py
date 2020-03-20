@@ -38,11 +38,12 @@ class BaseMealCardsViewSer(viewsets.GenericViewSet,
                     mcNamesCalories =   i['namesCalories']
                     
                     newMealCard = MealCard.objects.create(id=mcId, user=mcUser,     dateCreated=mcDateCreated,number=mcNumber, mealTitle=mcMealTitle)
-                    ingName = mcNamesCalories['name']
-                    ingEnergy = mcNamesCalories['energy']
-                    newIngredient = Ingredient.objects.create(name=ingName, energy=ingEnergy)
 
-                    newMealCard.namesCalories.add(newIngredient)
+                    for j in mcNamesCalories:
+                        ingName = j['name']
+                        ingEnergy = j['energy']
+                        newIngredient = Ingredient.objects.create(name=ingName, energy=ingEnergy)
+                        newMealCard.namesCalories.add(newIngredient)
                     print(newMealCard)
                     newMealCard.save()
 
@@ -63,7 +64,6 @@ class BaseMealCardsViewSer(viewsets.GenericViewSet,
                 mcDateCreated =     data4['dateCreated']
 
                 targetDayMealCards = MealCard.objects.order_by('number').filter(user=mcUser, dateCreated=mcDateCreated)
-                IngredientList = Ingredient.objects.get(mealcard = targetDayMealCards[0].id)
                 resp = []
 
                 for i in targetDayMealCards:
@@ -104,7 +104,10 @@ def listFoodPortionsInJson(jsonData):
     #----- Returns a list of food sizes to populate frontend dropdow -----#
     foodPortions = []
     for i in jsonData['foodPortions']:
-        description = i['portionDescription']
+        try:
+            description = i['portionDescription']
+        except KeyError: 
+            description = "default packaging"
         weight = i['gramWeight']
         foodPortions.append({description: weight})
 
@@ -136,6 +139,9 @@ class BaseIngredientsView(viewsets.GenericViewSet,
                 carbohydratesValue = searchForValueInJson(data, "Carbohydrate, by difference")
                 caloriesValue = calculateCaloriesFromNutrients(proteinValue, fatValue, carbohydratesValue)
                 foodPortions = listFoodPortionsInJson(data)
+                if foodPortions == []:
+                    defaultPortion = {'Default Portion': 100}
+                    foodPortions.append(defaultPortion)
 
                 response = {
                     'protein': proteinValue,

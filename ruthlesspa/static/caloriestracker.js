@@ -10,6 +10,12 @@ const sendToDbBtn = document.getElementById('sendToDB')
 const removeMealCardBtn = document.getElementById('removeMealCard')
 
 
+////Functions associated with those to variables need to be refactored into class for modularity
+var IngredientNameHelper = "";
+var IngredientCaloriesHelper = 0;
+///End
+
+
 var inputDate = searchedDate;
 var today = new Date().toISOString().substring(0, 10);
 const localStorageMealCards = JSON.parse(
@@ -84,6 +90,7 @@ function nutritionixAPI(mealCardNumber) {
 function getIngredientFromId() {
     let dropdown = document.getElementById('locality-dropdown')
     var idToSearch = dropdown.options[dropdown.selectedIndex].value;
+    IngredientNameHelper = dropdown.options[dropdown.selectedIndex].text;
     const payload = {
         reqIngredientId:  idToSearch
     }
@@ -99,15 +106,32 @@ function getIngredientFromId() {
     .then((data) => {
         console.log("Below is the full response from getIngredientFromId");
         console.log(data);
+        ///Consume data into populating portion sizes in a form
+        populateDropdownWithPortionSizes(data);
     });
 }
 
-function appendIngredientToMealCard() {
-    return
+function appendIngredientToMealCard(id, ingredientName, ingredientCalories) {
+    let targetMealCard = mealCards.filter(mealCard => mealCard.id == id)[0];
+    
+    let ingredientToAppend = {
+        name: ingredientName, 
+        energy: ingredientCalories};
+
+    targetMealCard.namesCalories.push(ingredientToAppend);
+    updateLocalStorage();
+    sumCaloriesOfTheDay(id)
+    init();
 }
 
-function updateFoodPortion() {
-    return
+function sumCaloriesOfTheDay(id) {
+    let targetMealCard = mealCards.filter(mealCard => mealCard.id == id)[0];
+    let arr = targetMealCard.namesCalories;
+    let sumOfCalories = 0;
+    for(var i = 0; i < arr.length; i++) {
+        sumOfCalories = sumOfCalories + parseInt(arr[i].energy);
+    };
+    return sumOfCalories;
 }
 
 
@@ -173,26 +197,26 @@ function addMealCardDOM(mealCard) {
             </div>
             <div class="card-body-add-position">
                 <span class="btn-sm
-                spanFoodInvisible" id="showAddFoodBtn" onclick="">+</span>
+                spanFoodInvisible" id="showAddFoodBtn">+</span>
             </div>
         </div>
 
         <div id="addFoodForm" class="formIndex mb-3 formIndexInvisible">
-            <button class="delete-btn btn-secondary" id="removeMealCard" onclick="">x</button>
+            <button class="delete-btn btn-secondary" id="removeMealCard">x</button>
             <form>
                 <h4 style="margin-top:1vh"> Food search </h4>
                 <input placeholder="food name" id="searchFoodNameInput${mealCard.number}">
                 <button type="button" class="btn-sm btn-search-food" id="nutritionixAddMeal" onclick="nutritionixAPI(${mealCard.number})">&#8627</button>
                 <select id="locality-dropdown" class="dropdownChoice" name="locality" onchange="getIngredientFromId()"></select>
                 <h4 style="margin-top:1vh"> Portion size </h4>
-                <select id="food-portion-dropdown" class="dropdownChoice" name="foodPortion" placeholder="Pick a portion" onchange="updateFoodPortion()"></select>
+                <select id="food-portion-dropdown" class="dropdownChoice" name="foodPortion" placeholder="Pick a portion"></select>
                 <h4 style="margin-top:1vh"> Quantity </h4>
-                <input placeholder="Quantity" id="ingredientQuantity">
-                <span class="btn-lg" id="QuantityPlus" onclick="">-</span>
-                <span class="btn-lg" id="QuantityMinus" onclick="">+</span>
+                <input class="quantityFormInput" placeholder="0" id="ingredientQuantity" disabled><span class="quantityFormInputSpan">g</span>
+                <span class="btn-lg quantityBtn quantityBtnLeft" id="QuantityMinus">-</span>
+                <span class="btn-lg quantityBtn" id="QuantityPlus">+</span>
                 <button class="btn-search-food btn-lg" id="addFoodFormBtn"
                 type="submit"> &#8676;Add position
-                </button>
+                </button><span class="btn-lg ingredientCaloriesSum" id="ingredientCaloriesSum">0kcal</span>
             </form>
         </div
     </div>
@@ -205,14 +229,17 @@ function addMealCardDOM(mealCard) {
 
     mealCard.namesCalories.forEach(function(item) {
         Object.keys(item).forEach(function(key) {
-            const element = document.createElement('div');
+            const element = document.createElement('span');
             element.innerHTML = `
-                            <p class="card-text-name"> ${item[key]} </p>
+                            ${item[key]}
         `;
         whatever.appendChild(element);
         });
         
     });
+    const element = document.createElement('span');
+    element.innerText = `${sumCaloriesOfTheDay(mealCard.id)}`;
+    whatever.appendChild(element);
  
     cardContainer.appendChild(item);
     const mealCardDomElement = document.getElementById('mealCard')
@@ -226,6 +253,14 @@ function addMealCardDOM(mealCard) {
         showAddFoodBtn.addEventListener('click', function() {
             addFoodForm.classList.remove('formIndexInvisible');
             addFoodForm.classList.add('formIndexVisible');
+            ////adding ingredient to localStorage functionality
+            let addFoodFormBtn = document.getElementById('addFoodFormBtn');
+            let ingredientCaloriesSum = document.getElementById('ingredientCaloriesSum');
+            
+            addFoodFormBtn.addEventListener('click', function() {
+                appendIngredientToMealCard(mealCard.id, IngredientNameHelper, IngredientCaloriesHelper);
+            })
+            ////end
         });
     });
     bodyElement.addEventListener('click', function(e) {
@@ -308,7 +343,7 @@ function populateDropdownWithFoodOptions(searchedFood) {
         
             for (let i = 0; i < data.foods.length; i++) {
             option = document.createElement('option');
-            option.text = data.foods[i].description + " " + data.foods[i].fdcId;
+            option.text = data.foods[i].description;
             option.value = data.foods[i].fdcId;
             dropdown.add(option);
             }    
@@ -320,6 +355,65 @@ function populateDropdownWithFoodOptions(searchedFood) {
     });
 }
 ///END OF DROPDOWN 
+
+
+function populateDropdownWithPortionSizes(data) {
+    let dropdown = document.getElementById('food-portion-dropdown');
+    dropdown.length = 0;
+
+    let defaultOption = document.createElement('option');
+    defaultOption.text = 'Choose portion size';
+    dropdown.add(defaultOption);
+
+    // Examine the text in the response  
+    console.log("populating the portionsize dropdown");
+    console.log(data);
+    let option;
+
+    for (let i = 0; i < data.foodPortions.length; i++) {
+        option = document.createElement('option');
+        option.text = Object.values(data.foodPortions[i]) + "g " + "[" + Object.keys(data.foodPortions[i]) + "]";
+        option.value = Object.values(data.foodPortions[i]);
+        dropdown.add(option);
+    }
+
+
+    ///Adding event listeners for quantity management
+    let ingredientQuantityInput = document.getElementById('ingredientQuantity');
+    let quantityPlusBtn = document.getElementById('QuantityPlus');
+    let quantityMinusBtn = document.getElementById('QuantityMinus');
+    let ingredientCaloriesSum = document.getElementById('ingredientCaloriesSum');
+    
+    ///helpers for event listeners
+    function populateIngredientCaloriesValue(data) {
+        let caloriesPer100g = data.calories;
+        let portionSizeMultiplier = parseInt(ingredientQuantityInput.value)*0.01;
+        let finalIngredientCalories = (caloriesPer100g * portionSizeMultiplier).toFixed(0);
+        ingredientCaloriesSum.textContent = `${finalIngredientCalories}kcal`;
+        return IngredientCaloriesHelper = finalIngredientCalories;
+    };
+
+
+    dropdown.addEventListener('change', function() {
+        if (dropdown.value) {
+            ingredientQuantityInput.value = parseInt(dropdown.value);
+            populateIngredientCaloriesValue(data);
+        };
+    });
+
+    quantityPlusBtn.addEventListener('click', function() {
+        ingredientQuantityInput.value = parseInt(ingredientQuantityInput.value) + parseInt(dropdown.value);
+        populateIngredientCaloriesValue(data);
+    });
+
+    quantityMinusBtn.addEventListener('click', function() {
+        if (ingredientQuantityInput.value > 0) {
+            ingredientQuantityInput.value = parseInt(ingredientQuantityInput.value) - parseInt(dropdown.value);
+            populateIngredientCaloriesValue(data);
+        };
+    });
+    
+}  
 
 
 
