@@ -5,6 +5,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    z-index: 1500;
 }
 
 #datepicker input {
@@ -23,6 +24,7 @@
     box-shadow: 0 0 8px 0 black;
     color: #333333;
     font: 16px Tahoma;
+    z-index: 1500;
 }
 
 #datepicker-frame ul {

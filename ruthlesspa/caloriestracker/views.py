@@ -92,13 +92,27 @@ class BaseMealCardsViewSer(viewsets.GenericViewSet,
         else:
             return HttpResponse('Unauthorized', status=401)
 
-#------- HELPER FUNCTIONCS -------#
+#------- HELPER FUNCTIONS -------#
 def searchForValueInJson(jsonData, searchedValue):
     amount = 0
     for i in jsonData['foodNutrients']:
         if i['nutrient']['name'].lower() == searchedValue.lower():
             amount = i['amount']
     return amount
+
+def listFoodPortionsInJson(jsonData):
+    #----- Returns a list of food sizes to populate frontend dropdow -----#
+    foodPortions = []
+    for i in jsonData['foodPortions']:
+        description = i['portionDescription']
+        weight = i['gramWeight']
+        foodPortions.append({description: weight})
+
+    return foodPortions
+
+def calculateCaloriesFromNutrients(proteinValue=0, fatValue=0, carbohydratesValue=0):
+    caloriesValue = proteinValue*4+fatValue*9+carbohydratesValue*4
+    return caloriesValue
 
 
 
@@ -119,12 +133,16 @@ class BaseIngredientsView(viewsets.GenericViewSet,
 
                 proteinValue = searchForValueInJson(data, "protein")
                 fatValue = searchForValueInJson(data, "Total lipid (fat)")
-                carbohydratesValue = searchForValueInJson(data, "Total lipid (fat)")
+                carbohydratesValue = searchForValueInJson(data, "Carbohydrate, by difference")
+                caloriesValue = calculateCaloriesFromNutrients(proteinValue, fatValue, carbohydratesValue)
+                foodPortions = listFoodPortionsInJson(data)
 
                 response = {
                     'protein': proteinValue,
                     'fat': fatValue,
                     'carbohydrates': carbohydratesValue,
+                    'calories': caloriesValue,
+                    'foodPortions': foodPortions,
                 }
                 
 

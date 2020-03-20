@@ -251,7 +251,11 @@ body {
 
 .dropdownChoice {
     min-width: 15rem;
+    max-width: 240px;
     z-index: 3;
+}
+.dropdownChoice:focus {
+    outline: none;
 }
 
 #ingredientQuantity {

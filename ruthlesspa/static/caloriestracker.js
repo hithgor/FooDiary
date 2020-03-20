@@ -71,13 +71,8 @@ function responseToObjectCreator(arrayOfObjects) {
     }
 
 function nutritionixAPI(mealCardNumber) {
-    var searchedFood = document.getElementById(`searchFoodNameInput${mealCardNumber}`).value
-    fetch(`https://api.nal.usda.gov/fdc/v1/search?api_key=tkjynWdwgrZk4ZSFXGK43b36n34uLXnY5aUQsWWc&generalSearchInput=${searchedFood}`, {
-        // headers: {
-        //     'x-app-id': 'b48a5753',
-        //     'x-app-key': '83576f841d15563674de1ab9f88986db',
-        // }
-    })
+    var searchedFood = document.getElementById(`searchFoodNameInput${mealCardNumber}`).value;
+    fetch(`https://api.nal.usda.gov/fdc/v1/search?api_key=tkjynWdwgrZk4ZSFXGK43b36n34uLXnY5aUQsWWc&generalSearchInput=${searchedFood}`)
     .then((response) => response.json())
     .then((data) => {
         console.log(data);
@@ -187,7 +182,7 @@ function addMealCardDOM(mealCard) {
             <form>
                 <h4 style="margin-top:1vh"> Food search </h4>
                 <input placeholder="food name" id="searchFoodNameInput${mealCard.number}">
-                <button class="btn-sm btn-search-food" id="nutritionixAddMeal" onclick="nutritionixAPI(${mealCard.number})">&#8627</button>
+                <button type="button" class="btn-sm btn-search-food" id="nutritionixAddMeal" onclick="nutritionixAPI(${mealCard.number})">&#8627</button>
                 <select id="locality-dropdown" class="dropdownChoice" name="locality" onchange="getIngredientFromId()"></select>
                 <h4 style="margin-top:1vh"> Portion size </h4>
                 <select id="food-portion-dropdown" class="dropdownChoice" name="foodPortion" placeholder="Pick a portion" onchange="updateFoodPortion()"></select>
