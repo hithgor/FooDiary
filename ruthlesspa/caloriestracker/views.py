@@ -5,11 +5,18 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from .models import MealCard, Ingredient
-
+import uuid
 
 
 def index(request):
     return render(request, 'ct/caloriestracker.html')
+
+def uuidGenerator(request):
+    """Endpoint generating uuid on demand for mealCards"""
+    context = {
+        "generatedId": uuid.uuid4()
+    }
+    return JsonResponse(context, safe=False)
 
 
 class BaseMealCardsViewSer(viewsets.GenericViewSet,
@@ -159,4 +166,75 @@ class BaseIngredientsView(viewsets.GenericViewSet,
 
         else:
             return HttpResponse('Unauthorized', status=401)
+
+
+
+
+
+class UserStatistics(viewsets.GenericViewSet,
+                             mixins.ListModelMixin,
+                             mixins.CreateModelMixin):
+    #Creation of user-data based plots and statistics
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    def statsToContext(userName):
+        # {datecreated1: [{id: sumOfEnergyForId}, {id: sumOfEnergyForId}]
+        #  datecreated2: [{id: sumOfEnergyForId}, {id: sumOfEnergyForId}]}
+
+        
+        context = []
+        userMealCards = MealCard.objects.order_by('number').filter(user=userName)
+
+        for i in userMealCards:
+            dateOfMC = i.dateCreated
+            caloriesSumByDay = []
+            energyCounted = 0
+            mealCardsByDay = MealCard.objects.filter(dateCreated = i.dateCreated)
+            for j in mealCardsByDay:
+                numberOfMealCard= j.number
+                energySumForMealCard=0
+                IngredientList = Ingredient.objects.filter(mealcard = j.id)
+                for k in IngredientList:
+                    energySumForMealCard = energySumForMealCard + k.energy
+                caloriesSumByDay.append({numberOfMealCard: energySumForMealCard})
+                energyCounted = energyCounted + energySumForMealCard
+            dictToCreate = {"date": dateOfMC, "arrayOfMealValues": caloriesSumByDay, "energyCounted": energyCounted}
+            if dictToCreate not in context:
+                context.append(dictToCreate)
+
+        # for i in userMealCards:
+        # dateOfMC = str(i.dateCreated)
+        # caloriesSumByDay = []
+        # mealCardsByDay = MealCard.objects.filter(dateCreated = i.dateCreated)
+        # for j in mealCardsByDay:
+        #     numberOfMealCard= j.number
+        #     energySumForMealCard=0
+        #     IngredientList = Ingredient.objects.filter(mealcard = j.id)
+        #     for k in IngredientList:
+        #         energySumForMealCard = energySumForMealCard + k.energy
+        #     caloriesSumByDay.append({numberOfMealCard: energySumForMealCard})
+        # context.append({dateOfMC: caloriesSumByDay})
+
+        newContext = sorted(context, key= lambda k: k['date'])
+        print(newContext)
+        return newContext
+
+
+
+    def getStats(request):
+        #Get request with user data and return monthly stats
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                mcUser = request.user
+                context = UserStatistics.statsToContext(mcUser)
+                
+
+                return JsonResponse(context, safe=False)
+        else:
+            return HttpResponse('Unauthorized', status=401)
+
+    def getPredictions(request):
+        #Get request with user data and return monthly predictions
+        return
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'caloriestracker',
     'ruthlesspa',
     'user',
+    'social_django',
 ]
 
 MIDDLEWARE = [

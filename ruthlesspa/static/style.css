@@ -1,7 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
 
 :root {
-    --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0, 0.24)
+    --box-shadow: 5px 5px 15px #ddd9d4, 
+    -5px -5px 15px #efebe6;
+    --box-shadow-small: 3px 3px 5px #d6d2ce, 
+    -3px -3px 5px #f6f2ec;
+
 }
 
 body {
@@ -9,6 +13,7 @@ body {
     text-align: center;
     font-family: 'Lato';
 }
+
 
 .logregist {
     padding: 0;
@@ -36,8 +41,7 @@ body {
     background: #efefef;
     padding: 15px 30px 20px 30px;
     text-align: center;
-    -webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+    box-shadow: var(--box-shadow)
   }
 
 
@@ -79,4 +83,13 @@ h1 .mainTitleH1 {
 
 #middleBtn {
     margin-top: 20px;
+}
+
+.datepickerInput {
+    background-color: rgba(255, 255, 255, 0.897);
+    color:#373A36;
+    border: none;
+    border-radius: 2px;
+    box-shadow: var(--box-shadow-small);
+    margin-bottom: 5px;
 }

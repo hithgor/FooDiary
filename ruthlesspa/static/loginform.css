@@ -3,6 +3,16 @@ body {
     background: #C5E1A5;
   }
 
+  .datepickerInput {
+    background-color: rgba(255, 255, 255, 0.897);
+    color:#373A36;
+    border: none;
+    border-radius: 2px;
+    box-shadow: var(--box-shadow-small);
+    margin-bottom: 5px;
+}
+
+
   .logregist label {
     display: block;
     position: relative;

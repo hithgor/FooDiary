@@ -3,14 +3,15 @@ import {searchedDate} from './Datepicker-master/datepicker.js'
 const cardContainer = document.getElementById('cardContainer')
 const addMealButton = document.getElementById('addMealButton')
 const loginHideShowDiv = document.getElementById('loginHideShowDiv')
-const toggleLogin = document.getElementById('toggleLogin')
 const bodyElement = document.getElementById('bodyId')
 const todayBtn = document.getElementById('todayBtn')
 const sendToDbBtn = document.getElementById('sendToDB')
+const toggleStats = document.getElementById('toggleStats')
+const lemonImage = document.getElementById('lemonImage')
 const removeMealCardBtn = document.getElementById('removeMealCard')
 
 
-////Functions associated with those to variables need to be refactored into class for modularity
+////Functions associated with those two variables need to be refactored into class for modularity
 var IngredientNameHelper = "";
 var IngredientCaloriesHelper = 0;
 ///End
@@ -24,24 +25,54 @@ const localStorageMealCards = JSON.parse(
 
 let mealCards =
     localStorage.getItem('mealCards') !== null ? localStorageMealCards : [];
-
 var mealNumber = mealCards.length
 
+/* ---- trying to consume UUID endpoint to use in mealCards id - unsuccesful.
+function generateID() {
+    ///return Math.floor(Math.random() * 100000000);
+    fetch(`http://127.0.0.1:8000/caloriestracker/uuidGenerator`)
+    .then((response) => response.json())
+    .then((data) => {
+        console.log("uuid from the backend:")
+        console.log(data);
+        console.log(data.generatedId);
+        return data.generatedId;
+    });
+  }
+
+*/
 
 
 function generateID() {
     return Math.floor(Math.random() * 100000000);
   }
 
+
+////addMealCard helper - naming meals based on numbers
+function mealNamer(mealNumber) {
+    switch(mealNumber) {
+        case 0:
+            return "Breakfast";
+        case 1:
+            return "Lunch";
+        case 2:
+            return "Dinner";
+        default:
+            return "Snack/Extra Meal";
+    };
+}
+////end of helpers
+
 function addMealCard() {
-    mealNumber = mealCards.length
+    mealNumber = mealCards.length;
+
     const mealCard = {
     id: generateID(),
     user: "",
     dateCreated: searchedDate,
     number: mealNumber,
-    mealTitle: "whatever",
-    namesCalories: [{name: "egg", energy: 55}, {name: "banana", energy: 110}]
+    mealTitle: mealNamer(mealNumber),
+    namesCalories: []
     };
 
     mealCards.push(mealCard);
@@ -69,6 +100,7 @@ function responseToObjectCreator(arrayOfObjects) {
         result.number = arr[i].number;
         result.dateCreated = arr[i].dateCreated;
         result.namesCalories = arr[i].namesCalories;
+        result.mealTitle = arr[i].mealTitle;
 
         mealCards.push(result);
     };
@@ -76,19 +108,19 @@ function responseToObjectCreator(arrayOfObjects) {
     init();
     }
 
-function nutritionixAPI(mealCardNumber) {
+function nutritionixAPI(mealCardNumber, mealCardId) {
     var searchedFood = document.getElementById(`searchFoodNameInput${mealCardNumber}`).value;
     fetch(`https://api.nal.usda.gov/fdc/v1/search?api_key=tkjynWdwgrZk4ZSFXGK43b36n34uLXnY5aUQsWWc&generalSearchInput=${searchedFood}`)
     .then((response) => response.json())
     .then((data) => {
         console.log(data);
-        populateDropdownWithFoodOptions(searchedFood);
+        populateDropdownWithFoodOptions(searchedFood, mealCardId);
     })
 }
 
 //// Refactor below into: send fetch to database, database sends request, saves json, gets calories from major nutrients, builds a response of {name: egg, calories: 55} and gives it back here
-function getIngredientFromId() {
-    let dropdown = document.getElementById('locality-dropdown')
+function getIngredientFromId(mealCardId) {
+    let dropdown = document.getElementById(`locality-dropdown${mealCardId}`)
     var idToSearch = dropdown.options[dropdown.selectedIndex].value;
     IngredientNameHelper = dropdown.options[dropdown.selectedIndex].text;
     const payload = {
@@ -107,9 +139,20 @@ function getIngredientFromId() {
         console.log("Below is the full response from getIngredientFromId");
         console.log(data);
         ///Consume data into populating portion sizes in a form
-        populateDropdownWithPortionSizes(data);
+        populateDropdownWithPortionSizes(data, mealCardId);
     });
 }
+
+function removeIngredientFromMealCard(id, ingredientName) {
+    let targetMealCard = mealCards.filter(mealCard => mealCard.id == id)[0];
+    let targetIngredientList = targetMealCard.namesCalories.filter(function(el) {
+        return el.name !== ingredientName;
+    });
+    targetMealCard.namesCalories = targetIngredientList;
+    updateLocalStorage();
+    init();
+}
+
 
 function appendIngredientToMealCard(id, ingredientName, ingredientCalories) {
     let targetMealCard = mealCards.filter(mealCard => mealCard.id == id)[0];
@@ -174,18 +217,22 @@ function removeMealCard(id) {
     updateLocalStorage();
     init();
 }
+///global functions - TO BE REFACTORED into event listeners one day
 window.removeMealCard = removeMealCard;
 window.nutritionixAPI = nutritionixAPI;
 window.getIngredientFromId = getIngredientFromId;
+///disabling enter from text inputs////
+window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){if(e.target.nodeName=='INPUT'&&e.target.type=='text'){e.preventDefault();return false;}}},true);
+
 
 function addMealCardDOM(mealCard) {
     /// Creating mealCard template from given payload
     const item = document.createElement('div');
     
     item.innerHTML = `
-    <div id="mealCard" class="card card2 mb-3">
+    <div id="${mealCard.id}" class="card card2 mb-3">
         <div>
-            <button class="delete-btn btn-secondary" id="removeMealCard" onclick="removeMealCard(${mealCard.id})">x</button>
+            <button class="btn-secondary delete-btn" id="removeMealCard" onclick="removeMealCard(${mealCard.id})">x</button>
             <div class="card-header">
                 <h4 class="meal-number">Meal ${mealCard.number}</h4>
                 <h5 class="card-title">${mealCard.mealTitle}</h5>
@@ -197,26 +244,27 @@ function addMealCardDOM(mealCard) {
             </div>
             <div class="card-body-add-position">
                 <span class="btn-sm
-                spanFoodInvisible" id="showAddFoodBtn">+</span>
+                spanFoodInvisible" id="showAddFoodBtn${mealCard.id}">+</span>
             </div>
         </div>
 
-        <div id="addFoodForm" class="formIndex mb-3 formIndexInvisible">
-            <button class="delete-btn btn-secondary" id="removeMealCard">x</button>
+        <div id="addFoodForm${mealCard.id}" class="formIndex mb-3 formIndexInvisible">
+            <button class="btn-secondary delete-btn" id="removeMealCard">x</button>
             <form>
                 <h4 style="margin-top:1vh"> Food search </h4>
-                <input placeholder="food name" id="searchFoodNameInput${mealCard.number}">
-                <button type="button" class="btn-sm btn-search-food" id="nutritionixAddMeal" onclick="nutritionixAPI(${mealCard.number})">&#8627</button>
-                <select id="locality-dropdown" class="dropdownChoice" name="locality" onchange="getIngredientFromId()"></select>
+                <input class="datepickerInput" placeholder="food name" id="searchFoodNameInput${mealCard.number}">
+                <button type="button" class="btn-secondary btnForm" id="nutritionixAddMeal${mealCard.id}" onclick="nutritionixAPI(${mealCard.number}, ${mealCard.id})">&#8627</button>
+                <select id="locality-dropdown${mealCard.id}" class="dropdownChoice" name="locality" onchange="getIngredientFromId(${mealCard.id})"></select>
                 <h4 style="margin-top:1vh"> Portion size </h4>
-                <select id="food-portion-dropdown" class="dropdownChoice" name="foodPortion" placeholder="Pick a portion"></select>
+                <select id="food-portion-dropdown${mealCard.id}" class="dropdownChoice" name="foodPortion" placeholder="Pick a portion"></select>
                 <h4 style="margin-top:1vh"> Quantity </h4>
-                <input class="quantityFormInput" placeholder="0" id="ingredientQuantity" disabled><span class="quantityFormInputSpan">g</span>
-                <span class="btn-lg quantityBtn quantityBtnLeft" id="QuantityMinus">-</span>
-                <span class="btn-lg quantityBtn" id="QuantityPlus">+</span>
-                <button class="btn-search-food btn-lg" id="addFoodFormBtn"
+                <input class="quantityFormInput" placeholder="0" id="ingredientQuantity${mealCard.id}" disabled><span class="quantityFormInputSpan">g</span>
+                <span class="btn-lg quantityBtn quantityBtnLeft" id="QuantityMinus${mealCard.id}">-</span>
+                <span class="btn-lg quantityBtn" id="QuantityPlus${mealCard.id}">+</span>
+                <span class="btn-lg ingredientCaloriesSum" id="ingredientCaloriesSum${mealCard.id}">0kcal</span>
+                <button class="btn-secondary btn-search-food" id="addFoodFormBtn${mealCard.id}"
                 type="submit"> &#8676;Add position
-                </button><span class="btn-lg ingredientCaloriesSum" id="ingredientCaloriesSum">0kcal</span>
+                </button>
             </form>
         </div
     </div>
@@ -226,14 +274,34 @@ function addMealCardDOM(mealCard) {
     ///Inserting food-calories pairs into ingrdiv above before creating mealcardDOM
     var whatever = item.querySelector(".card-body");
     whatever.innerHTML = ``;
+    var counterForSpan = 1;
 
     mealCard.namesCalories.forEach(function(item) {
         Object.keys(item).forEach(function(key) {
-            const element = document.createElement('span');
-            element.innerHTML = `
-                            ${item[key]}
-        `;
-        whatever.appendChild(element);
+            if(counterForSpan==1) {
+                ///Adding ingredientName span
+                const element = document.createElement('span');
+                element.setAttribute("id", `${mealCard.id}-${item[key]}`)
+                element.setAttribute("class", `ingredientName`)
+                element.innerHTML = `
+                                ${item[key]}
+                `;
+                element.addEventListener('click', function() {
+                    removeIngredientFromMealCard(mealCard.id, `${item[key]}`)
+                });
+                whatever.appendChild(element);
+                counterForSpan = counterForSpan - 1;
+
+            } else {
+                ///Adding calories for ingredient span
+                const element = document.createElement('span');
+                element.innerHTML = `
+                                ${item[key]}
+                `;
+            whatever.appendChild(element);
+            counterForSpan = counterForSpan + 1;
+            }
+
         });
         
     });
@@ -242,9 +310,9 @@ function addMealCardDOM(mealCard) {
     whatever.appendChild(element);
  
     cardContainer.appendChild(item);
-    const mealCardDomElement = document.getElementById('mealCard')
-    const showAddFoodBtn = document.getElementById('showAddFoodBtn')
-    const addFoodForm = document.getElementById('addFoodForm')
+    const mealCardDomElement = document.getElementById(`${mealCard.id}`)
+    const showAddFoodBtn = document.getElementById(`showAddFoodBtn${mealCard.id}`)
+    const addFoodForm = document.getElementById(`addFoodForm${mealCard.id}`)
 
     mealCardDomElement.addEventListener('click', function() {
         mealCardDomElement.classList.add('clickedAndCentered');
@@ -254,7 +322,7 @@ function addMealCardDOM(mealCard) {
             addFoodForm.classList.remove('formIndexInvisible');
             addFoodForm.classList.add('formIndexVisible');
             ////adding ingredient to localStorage functionality
-            let addFoodFormBtn = document.getElementById('addFoodFormBtn');
+            let addFoodFormBtn = document.getElementById(`addFoodFormBtn${mealCard.id}`);
             let ingredientCaloriesSum = document.getElementById('ingredientCaloriesSum');
             
             addFoodFormBtn.addEventListener('click', function() {
@@ -287,6 +355,7 @@ function updateLocalStorage() {
   
 function mealCardNumberIndexer(mealCard) {
     mealCard.number = mealCards.indexOf(mealCard);
+    mealCard.mealTitle = mealNamer(mealCard.number);
 }
   
 function sendToDb(data) {
@@ -314,8 +383,8 @@ function sendToDb(data) {
 }
 
 //// Dropdown with food options logic - create all options from JSON, after choosing send to others
-function populateDropdownWithFoodOptions(searchedFood) {
-    let dropdown = document.getElementById('locality-dropdown');
+function populateDropdownWithFoodOptions(searchedFood, mealCardId) {
+    let dropdown = document.getElementById(`locality-dropdown${mealCardId}`);
     dropdown.length = 0;
 
     let defaultOption = document.createElement('option');
@@ -357,8 +426,8 @@ function populateDropdownWithFoodOptions(searchedFood) {
 ///END OF DROPDOWN 
 
 
-function populateDropdownWithPortionSizes(data) {
-    let dropdown = document.getElementById('food-portion-dropdown');
+function populateDropdownWithPortionSizes(data, mealCardId) {
+    let dropdown = document.getElementById(`food-portion-dropdown${mealCardId}`);
     dropdown.length = 0;
 
     let defaultOption = document.createElement('option');
@@ -379,10 +448,10 @@ function populateDropdownWithPortionSizes(data) {
 
 
     ///Adding event listeners for quantity management
-    let ingredientQuantityInput = document.getElementById('ingredientQuantity');
-    let quantityPlusBtn = document.getElementById('QuantityPlus');
-    let quantityMinusBtn = document.getElementById('QuantityMinus');
-    let ingredientCaloriesSum = document.getElementById('ingredientCaloriesSum');
+    let ingredientQuantityInput = document.getElementById(`ingredientQuantity${mealCardId}`);
+    let quantityPlusBtn = document.getElementById(`QuantityPlus${mealCardId}`);
+    let quantityMinusBtn = document.getElementById(`QuantityMinus${mealCardId}`);
+    let ingredientCaloriesSum = document.getElementById(`ingredientCaloriesSum${mealCardId}`);
     
     ///helpers for event listeners
     function populateIngredientCaloriesValue(data) {
@@ -446,9 +515,14 @@ sendToDbBtn.addEventListener('click', function() {
     sendToDb(mealCards);
 })
 
-
-
-toggleLogin.addEventListener('click', function() {
-    toggleLog();
+toggleStats.addEventListener('click', function() {
+    lemonImage.classList.toggle('lemon-image')
 })
+
+window.onload = function() {
+    const toggleLogin = document.getElementById('toggleLogin');
+    toggleLogin.addEventListener('click', function() {
+        toggleLog();
+    });  
+}
 

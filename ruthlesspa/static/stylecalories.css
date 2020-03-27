@@ -1,11 +1,29 @@
 @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
 
 :root {
-    --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0, 0.24)
+    --box-shadow: 12px 12px 24px #bcb9c8, 
+    -12px -12px 24px #d8d5e6;
+    --box-shadow-img: 12px 12px 24px #bcb9c8, 
+     -12px -12px 24px #d8d5e6;
+    --box-shadow-small: 3px 3px 5px #bcb9c8, 
+    -3px -3px 5px #d8d5e6;
+    --box-shadow-small-buttons: 3px 3px 5px #bcb9c8, 
+    -3px -3px 5px #d8d5e6;
+    --box-shadow-inset: inset 5px 5px 10px #bcb9c8, 
+    inset -5px -5px 10px #d8d5e6;
+    --button-background: #CAC7d7;
+
+
+    --liw1: #f4ed71;
+    --liw2: #8a8604;
+    --liw3: #CAC7d7;
+    --liw4: #04030C;
+    --liw5: #383140;
 }
 
 body {
-    background-color: #373A36;
+    /*background: linear-gradient(90deg, rgba(4,3,12,1) 27%, rgba(202,199,215,1) 28%);*/
+    background-color: var(--liw3);
     font-family: 'Lato';
     display: flex;
     flex-direction: column;
@@ -14,24 +32,64 @@ body {
 }
 
 .navbar {
-    background-color: #E6E2DD;
+    background-color: var(--liw3);
     align-self: flex-start;
+    box-shadow: var(--box-shadow-small);
+    border-radius: 3px;
+    color: var(--liw4);
+    font-weight: bold;
 }
 
 .days {
     padding-top: 5vh;
 }
 
+.datepickerInput {
+    background-color: rgba(255, 255, 255, 0.85);
+    color: var(--liw4);
+    border: none;
+    border-radius: 2px;
+    box-shadow: var(--box-shadow-small);
+    margin-bottom: 5px;
+}
+
+.cardContainerButtons {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    min-width: 30rem;
+    display: flex;
+    align-items: flex-start;
+}
+
 .btn-secondary {
-    background-color: #E6E2DD;
-    color:#373A36;
+    min-width: 12rem;
+    margin-left: 1rem;
+    background-color: var(--button-background);
+    color: var(--liw4);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow-small-buttons);
+}
+.btn-secondary:hover {
+    background: var(--button-background);
+    box-shadow: var(--box-shadow-inset);
+    color: var(--liw4);
+    font-weight: bold;
+}
+
+.btn-secondary:focus {
+    outline: none;
 }
 
 .btn-search-food {
+    margin-top: 5px;
+    display: block;
     opacity: 0.75;
     border: none;
-    font-size: 20px;
-    background-color: inherit;
+    font-size: 16px;
+    background-color: var(--button-background);
+    box-shadow: var(--box-shadow-small-buttons);
+    border-radius: 3px;
 }
 
 .btn-search-food:hover {
@@ -47,6 +105,17 @@ body {
 
 .btn-search-food:focus {
     outline: none;
+}
+
+.delete-btn {
+    min-width: 0px;
+    max-width: 3rem;
+    margin-left: 1rem;
+    background-color: inherit;
+    color: var(--liw4);
+    border: none;
+    border-radius: 2px;
+    box-shadow: var(--box-shadow-small-buttons);
 }
 
 
@@ -101,27 +170,26 @@ body {
 .btn-outline-secondary {
     background-color: inherit;
     color: #373A36;
-    border-color: #373A36;
-    box-shadow: var(--box-shadow);
+    border: none;
+    box-shadow: var(--box-shadow-small)
 }
-
-.cardContainerButtons {
-    display: flex;
-    min-width: inherit;
-}
-
 
 .cardContainer {
     display: flex;
     height: 40vh;
+    margin-left: 15%;
     align-items: flex-start;
     max-width: 1250px;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 
 .card {
-    background-color: #E6E2DD;
-    color: #373A36;
+    background-color: var(--liw3);
+    border-radius: 25px;
+    border: none;
+    color: var(--liw4);
     display: flex;
     opacity: 1;
     min-width: 250px;
@@ -134,8 +202,11 @@ body {
 }
 
 .card2 {
-    background-color: #E6E2DD;
-    color: #373A36;
+    background-color: var(--liw3);
+    margin-left: 2rem;
+    border-radius: 25px;
+    border: none;
+    color: var(--liw4);
     display: flex;
     opacity: 0.9;
     min-width: 250px;
@@ -174,17 +245,32 @@ body {
 
 
 .card-body span {
-    width: 100%;
+    overflow: hidden;
+    max-width: 110px;
     flex: 0 0 50%;
     margin: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
+
+.card-body span:hover {
+    overflow: visible;
+    white-space: normal;
+}
+
+.ingredientName:hover {
+    text-decoration: line-through;
+    text-decoration-color: red;
+    cursor: pointer;
+}
+
 
 .card-body-add-position {
     z-index: 3;
 }
 
 .formIndex {
-    background-color: #E6E2DD;
+    background-color: var(--liw3);
     min-width: 250px;
     max-width: 250px;
     min-height: 40vh;
@@ -227,38 +313,136 @@ body {
     align-self: flex-end;
 }
 
-.calories-stats {
-    padding-top: 10vh;
-    min-width: 60%;
+.containerImageStats {
     display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.toggleStats {
+    display: flex;
+    position: absolute;
+    top: 7vh;
+    left: 0;
+}
+
+.toggleStatsBtn {
+    min-width: 0;
+    width: 6rem;
+    height: 10vh;
+    background-image: url(../media/statsicon.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.toggleStatsBtnHidden {
+    visibility: hidden;
+}
+
+.toggleStatsBtn:hover {
+    background-image: url(../media/statsicon.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.wrapLemonContainerBtn {
+    min-width: 0;
+    width: 3rem;
+    height: 5vh;
+    background-image: url(../media/pngwave.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0.8;
+}
+
+.wrapLemonContainerBtn:hover {
+    background-image: url(../media/pngwave.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 1;
+}
+
+.lemon-image {
+    transform: translateX(25rem);
+    transition-duration: 0.7s;
+}
+
+.lemon-image-invisible {
+    display: flex;
+    position: absolute;
+    top: 20vh;
+    left: -25rem;
+    opacity: 0.8;
+    border-radius: 25px;
+    flex: 0 0 40%;
+    width: 30rem;
+    min-height: 80vh;
+    max-height: 100vh;
+    box-shadow: var(--box-shadow-img);
+    transition-duration: 0.7s;
+}
+
+.plotContainer {
+    display: flex;
+    max-height: 60vh;
+    min-height: 480px;
+    max-width: 30rem;
+    align-self: flex-end;
+}
+
+.calories-stats {
+    margin-top: 5vh;
+    border-radius: 25px;
+    padding-top: 10vh;
+    display: flex;
+    flex: 0 0 40%;
+    flex-direction: row;
+    background-color: inherit;
+    box-shadow: var(--box-shadow);
+    margin-left: 10rem;
 }
 
 .weekly-consumed-stats {
+    border-radius: 25px;
     text-align: left;
-    color: #E6E2DD;
+    color: #373A36;
     flex: 1;
+    box-shadow: var(--box-shadow-small);
 }
 
 .monthly-prediction-stats {
+    border-radius: 25px;
     text-align: left;
-    color: #E6E2DD;
+    color: #373A36;
     flex: 1;
+    box-shadow: var(--box-shadow-small);
 }
 
-#addFoodFormBtn {
-    font-size: 1rem;
+.btnForm {
+    margin-left: 0px;
+    min-width: 0px;
+    width: 2rem;
 }
 
 .dropdownChoice {
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: var(--box-shadow-small);
     min-width: 15rem;
     max-width: 240px;
     z-index: 3;
 }
+
 .dropdownChoice:focus {
     outline: none;
 }
 
 .quantityFormInput {
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: var(--box-shadow-small);
     max-width: 4rem;
     text-align: right;
     padding-right: 20px;
@@ -278,19 +462,35 @@ body {
 }
 
 .ingredientCaloriesSum {
+    flex: 1 1 90%;
     text-decoration: underline;
+    align-self: flex-end;
+    display: block;
+    max-width: none;
+    width: 80%;
+    margin-top: 5px;
+    border-color: var(--liw4);
+    border-top: 1px solid;
+    text-align: right;
+    color:var(--liw4);
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 0px;
 }
 
 .card-body > span:last-child {
     flex: 1 1 90%;
     align-self: flex-end;
     display: block;
+    max-width: none;
     width: 80%;
     margin-top: 5px;
-    border-color: #373A36;
+    border-color: var(--liw4);
     border-top: 1px solid;
     text-align: right;
-    color:#373A36;
+    color:var(--liw4);
     font-size: 18px;
     font-weight: bold;
 }
+
+
