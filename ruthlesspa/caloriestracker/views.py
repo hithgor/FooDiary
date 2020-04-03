@@ -108,7 +108,7 @@ def searchForValueInJson(jsonData, searchedValue):
     return amount
 
 def listFoodPortionsInJson(jsonData):
-    #----- Returns a list of food sizes to populate frontend dropdow -----#
+    #----- Returns a list of food sizes to populate frontend dropdown -----#
     foodPortions = []
     for i in jsonData['foodPortions']:
         try:
@@ -178,13 +178,13 @@ class UserStatistics(viewsets.GenericViewSet,
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def statsToContext(userName):
-        # {datecreated1: [{id: sumOfEnergyForId}, {id: sumOfEnergyForId}]
-        #  datecreated2: [{id: sumOfEnergyForId}, {id: sumOfEnergyForId}]}
+    def fullStatsToContext(username):
+        # returns full list of objects to populate plotly graph in form: 
+        #[{'date': datetime.date(2020, 3, 3), 'arrayOfMealValues': [{0: 55}, {1: 55}, {2: 55}, {3: 55}], 'energyCounted': 220}, {'date': datetime.date(2020, 3, 4), 'arrayOfMealValues': [{0: 55}, {1: 55}, {2: 55}], 'energyCounted': 165}]
 
         
         context = []
-        userMealCards = MealCard.objects.order_by('number').filter(user=userName)
+        userMealCards = MealCard.objects.order_by('number').filter(user=username)
 
         for i in userMealCards:
             dateOfMC = i.dateCreated
@@ -203,21 +203,8 @@ class UserStatistics(viewsets.GenericViewSet,
             if dictToCreate not in context:
                 context.append(dictToCreate)
 
-        # for i in userMealCards:
-        # dateOfMC = str(i.dateCreated)
-        # caloriesSumByDay = []
-        # mealCardsByDay = MealCard.objects.filter(dateCreated = i.dateCreated)
-        # for j in mealCardsByDay:
-        #     numberOfMealCard= j.number
-        #     energySumForMealCard=0
-        #     IngredientList = Ingredient.objects.filter(mealcard = j.id)
-        #     for k in IngredientList:
-        #         energySumForMealCard = energySumForMealCard + k.energy
-        #     caloriesSumByDay.append({numberOfMealCard: energySumForMealCard})
-        # context.append({dateOfMC: caloriesSumByDay})
 
         newContext = sorted(context, key= lambda k: k['date'])
-        print(newContext)
         return newContext
 
 
@@ -227,7 +214,7 @@ class UserStatistics(viewsets.GenericViewSet,
         if request.user.is_authenticated:
             if request.method == 'POST':
                 mcUser = request.user
-                context = UserStatistics.statsToContext(mcUser)
+                context = UserStatistics.fullStatsToContext(mcUser)
                 
 
                 return JsonResponse(context, safe=False)

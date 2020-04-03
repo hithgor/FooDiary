@@ -88,11 +88,11 @@
     <script>
         var csrftoken = '{{ csrf_token }}';
     </script>
-    <script type="module" src="../static/main.js"></script>
+    <script type="module" src="{% static "main.js" %}"></script>
     <!-- Datepicker.js -->
-    <script type="module" src="../static/Datepicker-master/datepicker.js"></script>
-    <script type="module" src="../static/caloriestracker.js"></script>
-    <script type="module" src="../static/caloriesUserStats.js"></script>
+    <script type="module" src="{% static "Datepicker-master/datepicker.js" %}"></script>
+    <script type="module" src="{% static "caloriestracker.js" %}"></script>
+    <script type="module" src="{% static "caloriesUserStats.js" %}"></script>
     <!-- plotly -->
     <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 

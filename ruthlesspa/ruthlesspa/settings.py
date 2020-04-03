@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'caloriestracker',
     'ruthlesspa',
     'user',
-    'social_django',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,3 +140,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'ruthlesspa.User'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+MAILER_EMAIL_BACKEND = EMAIL_BACKEND  
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_HOST_PASSWORD = 'project1234`'  
+EMAIL_HOST_USER = 'test1chwesiuk@gmail.com'  
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

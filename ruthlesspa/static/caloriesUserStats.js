@@ -86,9 +86,6 @@ function fetchDataForUser() {
     })
     .then((response) => response.json())
     .then((data) => {
-        ///Here will land plotly-ready function
-        console.log("Data received from server on getStats: ");
-        console.log(data);
         plotMonthlyCaloriesIntake(data);
 
     })
