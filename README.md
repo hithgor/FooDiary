@@ -11,4 +11,4 @@ User-data plotted by plotly with calories consumption by day.
 
 
 Skills practiced while making that monstrosity:
-Django/Django REST/Django ORM, vanilla JS with fetch api, plotly, json parsing.  
+Django/Django REST/Django ORM, postgresql, vanilla JS with fetch api, plotly, json parsing.  
