@@ -92,7 +92,6 @@ class BaseMealCardsViewSer(viewsets.GenericViewSet,
                     }
                     resp.append(context)
                     
-        
                 return JsonResponse(resp, safe=False)
 
 

@@ -78,11 +78,12 @@ class CreateUserView(generics.CreateAPIView):
     @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
     def login(request):
         # Login User
+        print(request.body)
         email = request.POST.get('email')
         password = request.POST.get('password')
 
         user = auth.authenticate(username=email, password=password)
-
+        
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are now logged in')
