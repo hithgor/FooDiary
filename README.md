@@ -14,3 +14,16 @@ What it does:
 
 Skills practiced while making that monstrosity:
  Django/Django REST/Django ORM, postgresql, vanilla JS with fetch api, plotly, json parsing.  
+
+# I want to run it
+ clone the code
+ Get to path: /RuthlessPA/FooDiary
+ In your terminal run: source ./venv/Scripts/activate
+ In your terminal run: cd ruthlesspa
+ In your terminal run: python manage.py runserver
+ 
+ When server runs get to 127.0.0.1:8000/caloriestracker in your browser;
+ Click 'confirm and search' to get a login popup.
+ Login through the right window popup with credentials: hithgor1@gmail.com /// 1234
+ 
+ 
