@@ -15,7 +15,7 @@ What it does:
 Skills practiced while making that monstrosity:
  Django/Django REST/Django ORM, postgresql, vanilla JS with fetch api, plotly, json parsing.  
 
-# I want to run it
+# 'I want to run it'
  clone the code
  Get to path: /RuthlessPA/FooDiary
  In your terminal run: source ./venv/Scripts/activate
